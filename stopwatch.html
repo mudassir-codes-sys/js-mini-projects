@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stopwatch</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #f4f6f8;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .timer {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+        letter-spacing: 2px;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        opacity: 0.8;
+      }
+
+      .start {
+        background: #4caf50;
+        color: white;
+      }
+      .pause {
+        background: #ff9800;
+        color: white;
+      }
+      .reset {
+        background: #f44336;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="timer" id="display">00:00:00</div>
+      <div class="buttons">
+        <button class="start">Start</button>
+        <button class="pause">Pause</button>
+        <button class="reset">Reset</button>
+      </div>
+    </div>
+    <script>
+      let display = document.querySelector("#display");
+      let start = document.querySelector(".start");
+      let pause = document.querySelector(".pause");
+      let reset = document.querySelector(".reset");
+      let hours = 0;
+      let minutes = 0;
+      let seconds = 0;
+      function time() {
+        timer = setInterval(() => {
+          seconds++;
+          if (seconds === 60) {
+            seconds = 0;
+            minutes++;
+          }
+          if (minutes === 60) {
+            minutes = 0;
+            hours++;
+          }
+
+          let h, m, s;
+          if (hours < 10) {
+            h = "0" + hours;
+          } else {
+            h = hours;
+          }
+          if (minutes < 10) {
+            m = "0" + minutes;
+          } else {
+            m = minutes;
+          }
+
+          if (seconds < 10) {
+            s = "0" + seconds;
+          } else {
+            s = seconds;
+          }
+          display.innerText = `${h}:${m}:${s}`;
+        }, 1000);
+      }
+      start.addEventListener("click", time);
+      function pausing() {
+        clearInterval(timer);
+      }
+      pause.addEventListener("click", pausing);
+      function resetTime() {
+        hours = 0;
+        minutes = 0;
+        seconds = 0;
+        clearInterval(timer);
+        display.innerText = `00:00:00`;
+        timer = null;
+      }
+      reset.addEventListener("click", resetTime);
+    </script>
+  </body>
+</html>

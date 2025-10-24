@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #fff;
+      }
+
+      .text {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(8px);
+        border-radius: 15px;
+        padding: 30px 40px;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s ease;
+      }
+
+      .text:hover {
+        transform: translateY(-5px);
+      }
+
+      .verse {
+        font-size: 1.4rem;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        font-style: italic;
+        color: #f1f1f1;
+      }
+
+      .ref {
+        font-size: 1rem;
+        margin-bottom: 20px;
+        color: #a0a0a0;
+      }
+
+      .btn {
+        background: #0f3460;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      .btn:hover {
+        background: #533483;
+        transform: scale(1.05);
+      }
+
+      .btn:active {
+        transform: scale(0.95);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="text">
+      <p class="verse"></p>
+      <div class="ref"></div>
+      <button class="btn">Click Here</button>
+    </div>
+    <script>
+      let verse = document.querySelector(".verse");
+      let ref = document.querySelector(".ref");
+      let btn = document.querySelector(".btn");
+
+      async function loadPage() {
+        let api = await fetch(
+          "https://api.alquran.cloud/v1/ayah/96:1/en.sahih"
+        );
+        const data = await api.json();
+        verse.innerText = data.data.text;
+        ref.innerHTML = `Surah: ${data.data.surah.englishName} (${data.data.surah.name}) | Ayah: ${data.data.numberInSurah}`;
+      }
+      window.addEventListener("load", loadPage());
+      async function getData() {
+        let random = Math.floor(Math.random() * 6236 + 1);
+        let api = await fetch(
+          `https://api.alquran.cloud/v1/ayah/${random}/en.sahih`
+        );
+        const data = await api.json();
+        const text = data.data.text;
+        verse.innerText = text;
+        console.log(data);
+        let surahName = data.data.surah.name;
+        let ayah = data.data.numberInSurah;
+        let ruku = data.data.ruku;
+        const final =
+          (ref.innerHTML = `<span>Surah Name:${surahName} , Ayah Number: ${ayah} , Ruku:${ruku} `);
+      }
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        getData();
+      });
+    </script>
+  </body>
+</html>

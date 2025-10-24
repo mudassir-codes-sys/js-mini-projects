@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #f4f4f9;
+      }
+
+      .container {
+        width: 500px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .quiz-box {
+        /* display: none; */
+      }
+
+      .question {
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+
+      .options {
+        list-style: none;
+        padding: 0;
+      }
+
+      .options li {
+        background: #eee;
+        margin: 8px 0;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .options li:hover {
+        background: #d6d6f5;
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background: #4a4aff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
+      }
+
+      .btn:hover {
+        background: #3333cc;
+      }
+
+      .result-box {
+        display: none;
+        text-align: center;
+      }
+
+      .result-box h2 {
+        margin-bottom: 10px;
+      }
+      @media (max-width: 550px) {
+        #question {
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Quiz App</h1>
+
+      <!-- Start Screen -->
+      <div class="start-box">
+        <button class="btn" id="startBtn">Start Quiz</button>
+      </div>
+
+      <!-- Quiz Box -->
+      <div class="quiz-box" id="quizBox">
+        <div class="question" id="question"></div>
+        <ul class="options" id="options"></ul>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+
+      <!-- Result Box -->
+      <div class="result-box" id="resultBox">
+        <h2>Quiz Completed!</h2>
+        <p id="scoreText">Your Score: 0/0</p>
+        <button class="btn" id="restartBtn">Restart</button>
+      </div>
+    </div>
+
+    <script>
+      let restartBtn = document.querySelector("#restartBtn");
+      let startBtn = document.querySelector("#startBtn");
+      let question = document.querySelector("#question");
+      let ul = document.querySelector("#options");
+      let quizBox = document.querySelector("#quizBox");
+      let resultBox = document.querySelector("#resultBox");
+      let startBox = document.querySelector("#start-box");
+      let nextBtn = document.querySelector("#nextBtn");
+      let scoreText = document.querySelector("#scoreText");
+      let data = [
+        {
+          question: "What is 2 + 2?",
+          answers: {
+            answer_a: "3",
+            answer_b: "4",
+            answer_c: "5",
+            answer_d: null,
+          },
+          correct_answers: {
+            answer_a_correct: "false",
+            answer_b_correct: "true",
+            answer_c_correct: "false",
+            answer_d_correct: "false",
+          },
+        },
+        {
+          question: "Which color is the sky?",
+          answers: {
+            answer_a: "Blue",
+            answer_b: "Red",
+            answer_c: "Green",
+            answer_d: null,
+          },
+          correct_answers: {
+            answer_a_correct: "true",
+            answer_b_correct: "false",
+            answer_c_correct: "false",
+            answer_d_correct: "false",
+          },
+        },
+        {
+          question: "Which planet is known as the Red Planet?",
+          answers: {
+            answer_a: "Earth",
+            answer_b: "Mars",
+            answer_c: "Jupiter",
+            answer_d: null,
+          },
+          correct_answers: {
+            answer_a_correct: "false",
+            answer_b_correct: "true",
+            answer_c_correct: "false",
+            answer_d_correct: "false",
+          },
+        },
+        {
+          question: "What is the capital of France?",
+          answers: {
+            answer_a: "Paris",
+            answer_b: "London",
+            answer_c: "Berlin",
+            answer_d: null,
+          },
+          correct_answers: {
+            answer_a_correct: "true",
+            answer_b_correct: "false",
+            answer_c_correct: "false",
+            answer_d_correct: "false",
+          },
+        },
+        {
+          question: "Which gas do plants absorb from the atmosphere?",
+          answers: {
+            answer_a: "Oxygen",
+            answer_b: "Carbon Dioxide",
+            answer_c: "Nitrogen",
+            answer_d: null,
+          },
+          correct_answers: {
+            answer_a_correct: "false",
+            answer_b_correct: "true",
+            answer_c_correct: "false",
+            answer_d_correct: "false",
+          },
+        },
+      ];
+
+      let currIndex = 0;
+      let score = 0;
+      let answered = false;
+      async function showQuestion() {
+        startBtn.style.display = "none";
+        question.innerText = data[currIndex].question;
+        ul.innerHTML = "";
+        let options = data[currIndex].answers;
+        for (const value in options) {
+          if (options[value]) {
+            let li = document.createElement("li");
+            li.innerText = options[value];
+            li.dataset.correct =
+              data[currIndex].correct_answers[value + "_correct"];
+            ul.appendChild(li);
+          }
+        }
+      }
+      ul.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (answered) return;
+        if (e.target.tagName !== "LI") return;
+        answered = true;
+        if (e.target.dataset.correct === "true") {
+          score++;
+          if (e.target.dataset.correct === "true") {
+            e.target.style.border = "2px solid green";
+          }
+        } else {
+          e.target.style.border = "2px solid red";
+        }
+      });
+
+      startBtn.addEventListener("click", showQuestion);
+      function nextButton() {
+        if (!answered) return;
+        currIndex++;
+        if (currIndex >= data.length) {
+          resultBox.style.display = "block";
+          startBtn.style.display = "none";
+          quizBox.style.display = "none";
+          scoreText.innerText = `Your Score : ${score}/5`;
+        }
+        answered = false;
+        showQuestion();
+      }
+      nextBtn.addEventListener("click", nextButton);
+      function restart() {
+        currIndex = 0;
+        score = 0;
+        answered = false;
+        resultBox.style.display = "none";
+        startBtn.style.display = "block";
+        quizBox.style.display = "block";
+        showQuestion();
+      }
+      restartBtn.addEventListener("click", restart);
+
+      // const res = await fetch(
+      //   "https://quizapi.io/api/v1/questions?limit=10",
+      //   {
+      //     headers: {
+      //       "X-Api-Key": "sTxTM7fyA6NElRn3Vjgd2DgbMkDhThiDcUAS60oT", // yahan apni API key daali
+      //     },
+      //   }
+      // );
+      // data = await res.json();
+
+      //     let options = data[currIndex].answers;
+      //     ul.innerHTML = "";
+      //     for (let value in options) {
+      //       if (options[value]) {
+      //         let li = document.createElement("li");
+      //         li.innerText = options[value];
+      //         li.dataset.correct = data[currIndex].correct_answers[value + "_correct"];
+      //         ul.appendChild(li);
+      //       }
+      //     }
+
+      //   }
+      //    ul.addEventListener("click", (e) => {
+      //       if (answered) return;
+
+      //       answered = true;
+      //       [...ul.children].forEach((item) => {
+      //         item.style.border = "";
+      //         if (item.dataset.correct === "true") {
+      //           item.style.border = "2px solid  green";
+      //         }
+      //       });
+      //       if (e.target.dataset.correct === "true") {
+      //         score++;
+      //       } else {
+      //         e.target.style.border = "2px solid red";
+      //       }
+      //     });
+      //   nextBtn.addEventListener('click' , (e)=>{
+      //     if(!answered){
+      //       return;
+      //     }
+
+      //     if (currIndex>=data.length) {
+      //       quizBox.style.display='none';
+      //       resultBox.style.display="block";
+      //       scoreText.innerText=`Your Score: ${score}/${data.length}`;
+      //     }else{
+      //       currIndex++
+      //       quiz();
+      //     }
+
+      //   })
+      //  startBtn.addEventListener('click' , quiz)
+      //   li.addEventListener('click' , (e)=>{
+      //     e.preventDefault();
+      //     if (answered) {
+      //       return;
+      //     }
+      //     [...ul.children].forEach(list=>list.style.border='');
+      //     if (list.dataset.correct==="true") {
+
+      //       item.style.border="2px solid green";
+      //     }
+      //     if (e.target.dataset.correct==="true") {
+      //       score++;
+      //     }else{
+      //       li.style.border='2px solid tomato'
+      //     }
+
+      //   })
+      // }
+
+      //   // ul.addEventListener('click' , (e)=>{
+      //   //   e.preventDefault();
+      //   //   console.log(e.target.dataset.key);
+
+      //   }
+      // // )
+
+      // quiz()
+
+      // question.innerText= data[0].question;
+      // option.firstElementChild.innerText=data[0].answers.answer_a
+      // option.firstElementChild.nextElementSibling.innerText=data[0].answers.answer_b
+      // option.firstElementChild.nextElementSibling.nextElementSibling.innerText=data[0].answers.answer_c
+      // option.lastElementChild.innerText=data[0].answers.answer_d
+      // option.addEventListener('click' , (e)=>{
+      //     e.target.style.border= '2px solid blue'
+      //     console.dir(e.target);
+
+      // })
+    </script>
+  </body>
+</html>

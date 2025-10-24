@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Counter Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #f6f8ff, #eef2ff);
+      }
+      .container {
+        background: #fff;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 300px;
+      }
+      h1 {
+        margin-bottom: 16px;
+        color: #333;
+      }
+      .counter {
+        font-size: 48px;
+        font-weight: bold;
+        margin: 16px 0;
+        color: #4a4aff; /* default blue */
+        transition: color 0.3s, transform 0.2s;
+      }
+      .animate {
+        transform: scale(1.3);
+      }
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      button:hover {
+        opacity: 0.9;
+      }
+      .increase {
+        background: #4caf50;
+        color: #fff;
+      }
+      .decrease {
+        background: #f44336;
+        color: #fff;
+      }
+      .reset {
+        background: #4a4aff;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Counter Game</h1>
+      <div id="count" class="counter"></div>
+      <div class="buttons">
+        <button class="decrease" id="decreaseBtn">-</button>
+        <button class="reset" id="resetBtn">Reset</button>
+        <button class="increase" id="increaseBtn">+</button>
+      </div>
+    </div>
+    <script>
+      let count = document.querySelector("#count");
+      let decreaseBtn = document.querySelector("#decreaseBtn");
+      let increaseBtn = document.querySelector("#increaseBtn");
+      let resetBtn = document.querySelector("#resetBtn");
+      let value = 0;
+
+      function updateDisplay() {
+        count.innerText = value;
+        if (value === 0) {
+          count.style.color = "#4a4aff"; // blue
+        } else if (value > 0) {
+          count.style.color = "#4caf50"; // green
+        }
+        count.classList.add("animate");
+        setTimeout(() => count.classList.remove("animate"), 200);
+      }
+
+      increaseBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        value++;
+        updateDisplay();
+        save();
+      });
+
+      decreaseBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (value <= 0) {
+          return;
+        }
+        value--;
+        updateDisplay();
+        save();
+      });
+
+      resetBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        value = 0;
+        updateDisplay();
+        save();
+      });
+
+      function save() {
+        localStorage.setItem("count", value);
+      }
+
+      window.addEventListener("load", load);
+      function load() {
+        let saved = localStorage.getItem("count");
+        if (saved !== null) {
+          value = parseInt(saved);
+        } else {
+          value = 0;
+        }
+        updateDisplay();
+      }
+    </script>
+  </body>
+</html>

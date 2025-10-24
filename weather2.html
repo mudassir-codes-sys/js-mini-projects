@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Weather App</title>
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #0b1220;
+        --accent: #60a5fa;
+        --muted: #9aa6b2;
+        --glass: rgba(255, 255, 255, 0.03);
+        --radius: 14px;
+        --gap: 16px;
+        --font-sans: system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: var(--font-sans);
+        background: linear-gradient(180deg, #071026 0%, #071a2a 100%);
+        color: #e6eef6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .app {
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 24px;
+      }
+
+      /* header */
+      .header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 18px;
+        text-align: center;
+      }
+      .title {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      /* search */
+      .search {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .search-row {
+        display: flex;
+        gap: 8px;
+      }
+      input#cityInput {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        color: inherit;
+        font-size: 1rem;
+        outline: none;
+      }
+      input#cityInput::placeholder {
+        color: var(--muted);
+      }
+      button#searchBtn {
+        padding: 0 18px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(180deg, var(--accent), #3b82f6);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        min-width: 88px;
+        box-shadow: 0 6px 18px rgba(59, 130, 246, 0.18);
+      }
+      button#searchBtn:active {
+        transform: translateY(1px);
+      }
+
+      /* message */
+      .msg {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0;
+      }
+
+      /* card */
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: var(--radius);
+        padding: 18px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      //*.hidden{display:none}*//
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .card-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+      .card-header time {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      /* main */
+      .card-main {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      .temp-block {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .icon {
+        font-size: 48px;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--glass);
+        border-radius: 12px;
+      }
+      .temp {
+        font-weight: 700;
+        font-size: 2.4rem;
+        line-height: 1;
+      }
+      .temp sup {
+        font-size: 0.6rem;
+        vertical-align: super;
+      }
+      .details {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+      .details li {
+        margin-bottom: 6px;
+      }
+      .card-footer {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-align: right;
+      }
+      .credits {
+        margin-top: 30px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <h1 class="title">Weather App</h1>
+        <p class="subtitle">Enter a city name to check the weather</p>
+      </header>
+
+      <section class="search">
+        <label for="cityInput" class="visually-hidden">City</label>
+        <div class="search-row">
+          <input
+            id="cityInput"
+            type="text"
+            placeholder="e.g. London"
+            autocomplete="off"
+          />
+          <button id="searchBtn" type="button" aria-label="Search">
+            Search
+          </button>
+        </div>
+        <p id="msg" class="msg" aria-live="polite"></p>
+      </section>
+
+      <section
+        id="weatherCard"
+        class="card hidden"
+        role="region"
+        aria-label="Weather result"
+      >
+        <div class="card-header">
+          <h2 id="cityName">--</h2>
+          <time id="localTime" datetime="">--</time>
+        </div>
+
+        <div class="card-main">
+          <div class="temp-block">
+            <div id="icon" class="icon" aria-hidden="true">☁️</div>
+            <div class="temp"><span id="tempValue">--</span><sup>°C</sup></div>
+          </div>
+
+          <ul class="details">
+            <li>Condition: <span id="desc">--</span></li>
+            <li>Humidity: <span id="humidity">--</span>%</li>
+            <li>Wind Speed: <span id="wind">--</span> m/s</li>
+          </ul>
+        </div>
+
+        <footer class="card-footer">
+          <small>Powered by Weather API</small>
+        </footer>
+      </section>
+
+      <footer class="credits">
+        <small>Built with ❤ — add your own JS in <code>app.js</code></small>
+      </footer>
+    </main>
+
+    <script>
+      let card = document.querySelector("#weatherCard");
+      card.classList.remove("hidden");
+      let cityInput = document.querySelector("#cityInput");
+      let searchBtn = document.querySelector("#searchBtn");
+      let msg = document.querySelector("#msg");
+      let cityName = document.querySelector("#cityName");
+      let localTime = document.querySelector("#localTime");
+      let tempValue = document.querySelector("#tempValue");
+      let Condition = document.querySelector("#desc");
+      let humidity = document.querySelector("#humidity");
+      let wind = document.querySelector("#wind");
+      async function Weather() {
+        let input = cityInput.value;
+        const apiKey = "7d1a2a46582f456495e81d1293904ca8";
+        const result = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${input}&units=metric&appid=${apiKey}`
+        );
+        const data = await result.json();
+        if (!input) {
+          msg.textContent = "⚠ Please enter a city name";
+        }
+        msg.textContent = "Loading....";
+        try {
+          if (data.cod === 200) {
+            tempValue.innerText = data.main.temp;
+            const date = new Date(data.dt * 1000);
+            localTime.innerText = date.toLocaleTimeString();
+            cityName.innerText = data.name;
+            Condition.innerText = data.weather[0].description;
+            humidity.textContent = data.main.humidity;
+            wind.textContent = data.wind.speed;
+            msg.textContent = "";
+
+            const weatherMain = data.weather[0].main.toLowerCase();
+            if (weatherMain.includes("cloud")) icon.textContent = "☁️";
+            else if (weatherMain.includes("rain")) icon.textContent = "🌧️";
+            else if (weatherMain.includes("clear")) icon.textContent = "☀️";
+            else if (weatherMain.includes("snow")) icon.textContent = "❄️";
+            else icon.textContent = "🌡️";
+            input.value = "";
+          } else {
+            msg.textContent = "City not found!";
+          }
+        } catch (error) {
+          msg.textContent = "Something went wrong! Please try again later....";
+        }
+      }
+
+      searchBtn.addEventListener("click", Weather);
+      cityInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+          Weather();
+        }
+      });
+    </script>
+  </body>
+</html>

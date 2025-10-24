@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+       /* ---- Reset-ish ---- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ---- Page ---- */
+html, body {
+  height: 100%;
+}
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, #0f172a 0%, #061123 100%);
+  color: #e6f0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* ---- Card / Wrapper ---- */
+.head {
+  width: 100%;
+  max-width: 520px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ---- Title ---- */
+.heading {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 18px;
+  letter-spacing: 0.2px;
+}
+
+/* ---- Input row ---- */
+label { display:none; } /* keeping existing HTML */
+.guessField {
+  width: calc(100% - 120px);
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  color: #e6f0ff;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow .18s ease, transform .08s ease;
+  margin-right: 10px;
+}
+
+.guessField:focus {
+  box-shadow: 0 6px 20px rgba(14,165,233,0.12);
+  border-color: rgba(14,165,233,0.5);
+  transform: translateY(-1px);
+}
+
+/* ---- Buttons ---- */
+.btn, .NewGame {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform .08s ease, box-shadow .12s ease;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+}
+
+/* Primary submit */
+.btn {
+  background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+  color: #04202a;
+  min-width: 90px;
+}
+
+.btn:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(6,182,212,0.12); }
+.btn:active { transform: translateY(-1px); }
+
+/* Secondary New Game */
+.NewGame {
+  background: transparent;
+  color: #9fb9d6;
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-top: 16px;
+  width: 100%;
+}
+
+.NewGame:hover { background: rgba(255,255,255,0.02); transform: translateY(-2px); }
+
+    </style>
+</head>
+<body>
+    <div class="head">
+        <h1 class="heading">Guess the Number between 1 to 100</h1>
+        <label for="input"></label>
+        <input class="guessField" type="text" name="input" id="input">
+        <button class="btn">Submit</button>
+        <h2 class="result"></h2>
+        <p>Previous Guesses :<span class="previousGuesses"></span></p>
+        <p>Guesses Remaining: <span class="guessesRemaining">10</span></p> 
+       <button class="NewGame">Start New Game</button>
+    </div>
+    <script>
+        
+const randomNumber = parseInt(Math.random() * 100 + 1);
+const previousGuesses = document.querySelector(".previousGuesses");
+const guessesRemaining = document.querySelector(".guessesRemaining");
+const userInput = document.querySelector(".guessField");
+const btn = document.querySelector(".btn");
+const button = document.querySelector(".NewGame");
+const Guesses = [];
+let playGame = true;
+let remaining = 10;
+
+btn.addEventListener('click' , ()=>{
+    if (!playGame) return;
+    const userGuess=parseInt(userInput.value);
+if (isNaN(userGuess) || userGuess<1 || userGuess>100) {
+    alert('Please enter a valid number');
+
+}
+Guesses.push(userGuess);
+previousGuesses.textContent=Guesses;
+remaining--;
+guessesRemaining.textContent=remaining;
+
+if (userGuess===randomNumber) {
+    document.querySelector(".result").textContent="Wow you guessed the right number"
+    playGame=false;
+}else if (remaining===0){
+    document.querySelector(".result").textContent=`Game over .. The number was ${randomNumber}`
+    playGame=false
+} else if (userGuess < randomNumber) {
+    document.querySelector(".result").textContent = "Too low! Try again.";
+   } else {
+    document.querySelector(".result").textContent = "Too high! Try again.";
+  }
+userInput.value=""
+
+})
+button.addEventListener("click" , ()=>{
+    guess=[]
+    remaining=10
+    playGame=true;
+    previousGuesses.textContent=""
+    guessesRemaining.textContent=remaining;
+    document.querySelector(".result").textContent="";
+    userInput.value=""
+
+
+})
+    </script>
+</body>
+</html>

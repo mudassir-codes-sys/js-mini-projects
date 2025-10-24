@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
+  body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #4b6cb7, #182848);
+    color: #fff;
+  }
+
+  .time {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    min-width: 200px;
+    text-align: center;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 20px;
+  }
+
+  button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .start {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .stop {
+    background-color: #f44336;
+    color: white;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+</style>
+
+  </head>
+  <body>
+    <button class="start">Start</button>
+    <button class="stop">Stop</button>
+    <div class="time"></div>
+    <script>
+      let start = document.querySelector(".start");
+      let stop = document.querySelector(".stop");
+
+      let startStop;
+      let div = document.querySelector(".time");
+      function practice() {
+        // console.log(`${name} ${date.toLocaleTimeString()}`);
+        let date = new Date();
+        div.textContent = `${date.toLocaleTimeString()}`;
+      }
+      start.addEventListener("click", () => {
+        startStop = setInterval(practice, 1000);
+      });
+      stop.addEventListener("click", () => {
+        clearInterval(startStop);
+        div.textContent = "";
+      });
+    </script>
+  </body>
+</html>

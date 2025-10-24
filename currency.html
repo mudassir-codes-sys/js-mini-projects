@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .converter {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+      }
+
+      .converter h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .converter input,
+      .converter select,
+      .converter button {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      .converter button {
+        background: #4caf50;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+
+      .converter button:hover {
+        background: #45a049;
+      }
+
+      #result {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #222;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="converter">
+      <h2>Currency Converter</h2>
+      <input type="number" id="amount" placeholder="Enter amount" />
+      <select id="from"></select>
+      <select id="to"></select>
+      <button>Convert</button>
+      <p id="result"></p>
+    </div>
+
+    <script>
+      let select1 = document.querySelector("#from");
+      let select2 = document.querySelector("#to");
+
+      let  resultbox = document.querySelector("#result");
+      let amount = 200; // jitne USD convert karne hain
+      let from = "USD"; // base currency
+      let to = "PKR"; // target currency
+
+      const url =
+        "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json";
+
+
+      async function code() {
+        let res = await fetch(url);
+        let data = await res.json();
+        for (let [code, name] of Object.entries(data)) {
+          let option1 = document.createElement("option");
+          option1.innerText = code;
+
+          select1.appendChild(option1);
+          //   let option2 =   document.createElement('option')
+          let option2 = option1.cloneNode(true);
+          select2.appendChild(option2);
+
+          select1.value='usd';
+          select2.value='pkr';
+
+        }
+      }
+
+      code();
+      <!--!--> Appending in input 1 and 2.
+
+      async function Convert() {
+        let inputField = document.querySelector("#amount");
+        let amount = inputField.value;
+        let from = select1.value;
+        let to = select2.value;
+        let result = await fetch (`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${from}.json`);
+        let data = await result.json();
+        console.log(data);
+        
+        let rate = data[from.toLowerCase()][to.toLowerCase()];
+        let conversion = amount * rate;
+         resultbox.innerText = `${amount} ${from.toUpperCase()} = ${conversion.toFixed(2)} ${to.toUpperCase()}`;
+
+      }
+      document.querySelector("button").addEventListener('click'  , Convert)
+    </script>
+  </body>
+</html>
+
+

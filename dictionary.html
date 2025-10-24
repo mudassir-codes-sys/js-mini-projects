@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dictionary App</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 500px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+
+      .search-box {
+        display: flex;
+        gap: 10px;
+      }
+
+      .search-box input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      .search-box button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        background: #007bff;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .search-box button:hover {
+        background: #0056b3;
+      }
+
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 5px;
+        background: #fafafa;
+      }
+
+      .result h2 {
+        margin: 0 0 10px;
+        font-size: 20px;
+        
+      }
+
+      .result p {
+        margin: 5px 0;
+        line-height: 1.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Dictionary App</h1>
+      <div class="search-box">
+        <input type="text" id="wordInput" placeholder="Enter a word..." />
+        <button id="searchBtn">Search</button>
+      </div>
+      <div class="result" id="result">
+        <h2>Meaning</h2>
+        <p> </p>
+      </div>
+    </div>
+    <script>
+        let button = document.querySelector("#searchBtn");
+        let def = document.querySelector("p");
+        
+        async function Dictionary() {
+            let input = document.querySelector("#wordInput");
+            try {
+                let result = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${input.value}`);
+                let data = await result.json();
+                // (data[0].meanings[2].definitions.forEach(definition => {
+                //     def.innerText= definition.definition;
+                    
+                // }));
+                let m1=(data[0].meanings[2].definitions[0].definition);
+               let m2 =(data[0].meanings[2].definitions[1].definition);
+               let m3 =(data[0].meanings[2].definitions[2].definition);
+                def.innerHTML=`1-${m1} `
+                
+                
+            } catch (error) {
+                console.log('error');
+                
+            }
+            
+            
+        }
+      
+        button.addEventListener("click" , Dictionary)
+   
+
+
+    </script>
+  </body>
+</html>
