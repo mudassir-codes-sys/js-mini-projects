@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: #f4f6f8;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 30px;
+      }
+
+      .container {
+        width: 400px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .balance-box {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .balance-box h3 {
+        font-size: 1.8rem;
+        color: #2e8b57;
+      }
+
+      .income-expense {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+      }
+
+      .income-expense > div {
+        width: 45%;
+        text-align: center;
+      }
+
+      .plus {
+        color: #2ecc71;
+        font-weight: bold;
+      }
+
+      .minus {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .list {
+        list-style-type: none;
+        margin-bottom: 20px;
+      }
+
+      .list li {
+        background: #fff;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        margin: 8px 0;
+        border-right: 5px solid #2ecc71;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .list li.minus {
+        border-right-color: #e74c3c;
+      }
+
+      .btn {
+        width: 100%;
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+      }
+
+      .btn:hover {
+        background: #2980b9;
+      }
+
+      .form-control {
+        margin-bottom: 15px;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+      }
+      .delBtn {
+        background-color: #e74c3c;
+        color: #fff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+      }
+
+      .delBtn:hover {
+        background-color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>💸 Expense Tracker</h1>
+
+      <div class="balance-box">
+        <h2>Your Balance</h2>
+        <h3 id="balance">$0.00</h3>
+      </div>
+
+      <div class="income-expense">
+        <div class="inc">
+          <h4>Income</h4>
+          <p id="income" class="money plus">+$0.00</p>
+        </div>
+        <div class="exp">
+          <h4>Expense</h4>
+          <p id="expense" class="money minus">-$0.00</p>
+        </div>
+      </div>
+
+      <h3>History</h3>
+      <ul id="list" class="list">
+        <!-- Transactions will appear here -->
+      </ul>
+
+      <h3>Add New Transaction</h3>
+      <form id="form">
+        <div class="form-control">
+          <label for="text">Description</label>
+          <input type="text" id="text" placeholder="Enter description..." />
+        </div>
+        <div class="form-control">
+          <label for="amount"
+            >Amount <br />
+            (positive = income, negative = expense)</label
+          >
+          <input type="number" id="amount" placeholder="Enter amount..." />
+        </div>
+        <button class="btn">Add Transaction</button>
+      </form>
+    </div>
+
+    <script>
+      //DOM
+      const balance = document.querySelector("#balance");
+      const income = document.querySelector("#income");
+      const expense = document.querySelector("#expense");
+      const unordered = document.querySelector("#list");
+      const input = document.querySelector("#text");
+      const amountEl = document.querySelector("#amount");
+      const amount = amountEl.value;
+      const form = document.querySelector("#form");
+      const button = document.querySelector(".btn");
+      let remainingBalance = 0;
+      let totalIncome = 0;
+      let expenses = 0;
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        data();
+      });
+
+      //getting Input
+      const data = () => {
+        const text = input.value;
+        const amount = +amountEl.value;
+        if (!text || isNaN(amount)) return;
+        let transaction = { id: Date.now(), text, amount };
+        history(transaction);
+        input.value = "";
+        amountEl.value = "";
+        transactions.push(transaction);
+        save();
+        calculations(amount);
+      };
+      //adding
+      const history = (transaction, skipBalanceCheck = false) => {
+        const { text, amount, id } = transaction;
+        if (
+          !skipBalanceCheck &&
+          amount < 0 &&
+          Math.abs(amount) > remainingBalance
+        ) {
+          return;
+        }
+        const li = document.createElement("li");
+        li.innerText = `${text} ${amount}`;
+        li.classList.add(amount < 0 ? "minus" : "plus");
+        li.dataset.amount = amount;
+        li.dataset.id = id;
+        delButton(li);
+        unordered.appendChild(li);
+      };
+      //deleting
+      const delButton = (li) => {
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "Delete";
+        delBtn.classList.add("delBtn");
+        li.appendChild(delBtn);
+        delBtn.addEventListener("click", (e) => {
+          const amount = li.dataset.amount;
+          const id = +li.dataset.id;
+          li.remove();
+          if (amount > 0) {
+            totalIncome -= amount;
+          } else {
+            expenses -= Math.abs(amount);
+          }
+
+          remainingBalance = totalIncome - expenses;
+          updateDisplay();
+          transactions = transactions.filter((t) => t.id !== id);
+          save();
+        });
+      };
+      //calculations
+      const calculations = (amount) => {
+        if (amount < 0 && Math.abs(amount) > remainingBalance) {
+          alert("Insufficient balance");
+          return;
+        }
+        if (amount > 0) {
+          totalIncome += amount;
+        } else {
+          expenses += Math.abs(amount);
+        }
+        remainingBalance = totalIncome - expenses;
+        updateDisplay();
+      };
+      // Updating Display
+      const updateDisplay = () => {
+        balance.innerText = `$${remainingBalance.toFixed(2)}`;
+        expense.innerText = `$${expenses.toFixed(2)}`;
+        income.innerText = `$${totalIncome.toFixed(2)}`;
+      };
+
+      //save in LocalStorage
+      const save = () => {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+      };
+
+      // get from local storage
+      const localStorageItems = (transaction) => {
+        const { amount, text } = transaction;
+      };
+      window.addEventListener("DOMContentLoaded", () => {
+        transactions.forEach((transaction) => {
+          history(transaction, true);
+          calculations(transaction.amount);
+        });
+      });
+    </script>
+  </body>
+</html>
