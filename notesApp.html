@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Notes App</title>
+    <style>
+      /* Reset & Base */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* Dark Mode */
+      body.dark {
+        background: #1e1e1e;
+        color: #eee;
+      }
+
+      /* Header */
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      header h1 {
+        font-size: 24px;
+      }
+      header .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      /* Buttons & Inputs */
+      button {
+        cursor: pointer;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        background: #7c3aed;
+        color: white;
+      }
+      input,
+      textarea,
+      select {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+
+      /* Notes Grid */
+      #notesContainer {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      /* Individual Note */
+      .note-card {
+        padding: 15px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      .note-card.dark {
+        background: #333;
+        color: #eee;
+      }
+      .note-card h3 {
+        margin-bottom: 10px;
+      }
+      .note-card p {
+        margin-bottom: 10px;
+      }
+      .note-card .note-actions {
+        position: static;
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+      }
+      .note-card .note-actions button {
+        padding: 6px 10px;
+        font-size: 14px;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 400px;
+        position: relative;
+      }
+      .modal-content.dark {
+        background: #222;
+        color: #eee;
+      }
+      .modal-controls {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+      }
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <h1>Advanced Notes App</h1>
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search notes..." />
+        <button id="toggleTheme">Toggle Dark/Light</button>
+        <button id="addNoteBtn">Add Note</button>
+      </div>
+    </header>
+
+    <!-- Notes Container -->
+    <main id="notesContainer">
+      <!-- Individual notes will be dynamically rendered here -->
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="noteModal" class="modal">
+      <div class="modal-content">
+        <h2 id="modalTitle">Add Note</h2>
+        <input type="text" id="noteTitle" placeholder="Title" />
+        <textarea id="noteContent" placeholder="Write your note..."></textarea>
+        <div class="modal-controls">
+          <select id="noteCategory">
+            <option value="personal">Personal</option>
+            <option value="work">Work</option>
+            <option value="urgent">Urgent</option>
+          </select>
+          <input type="color" id="noteColor" value="#ffd700" />
+        </div>
+        <div class="modal-buttons">
+          <button id="saveNote">Save</button>
+          <button id="closeModal">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const modal = document.querySelector(".modal");
+      const addButton = document.querySelector("#addNoteBtn");
+      const cancelButton = document.querySelector("#closeModal");
+      //*
+      const noteTitle = document.querySelector("#noteTitle");
+      const noteContent = document.querySelector("#noteContent");
+      const noteCategory = document.querySelector("#noteCategory");
+      const noteColor = document.querySelector("#noteColor");
+      const saveNote = document.querySelector("#saveNote");
+      const notesContainer = document.querySelector("#notesContainer");
+      const search = document.querySelector("#searchInput");
+      const toggleTheme = document.querySelector("#toggleTheme");
+
+      //*
+      let storage = JSON.parse(localStorage.getItem("notes")) || [];
+      let editingNote = null;
+      //! Show Modal
+      const showModal = () => {
+        modal.style.display = "block";
+      };
+      addButton.addEventListener("click", showModal);
+      //! Remove Modal
+      const removeModal = () => {
+        modal.style.display = "none";
+      };
+      cancelButton.addEventListener("click", () => {
+        editingNote = null;
+        removeModal();
+      });
+
+      //! Save in local Storage
+
+      const save = () => {
+        localStorage.setItem("notes", JSON.stringify(storage));
+      };
+
+      //! New Note
+      const newNote = () => {
+        if (!noteTitle.value || !noteContent.value) return;
+        const data = {
+          id: Date.now(),
+          title: noteTitle.value,
+          content: noteContent.value,
+          category: noteCategory.value,
+          color: noteColor.value,
+          pinned: false,
+        };
+        //! save in localStorage
+
+        storage.push(data);
+        save();
+        savedNotes(data);
+        //!reset
+        noteTitle.value = "";
+        noteContent.value = "";
+        modal.style.display = "none";
+      };
+
+      //! render saved notes
+      const savedNotes = (note) => {
+        const div = document.createElement("div");
+        div.classList.add("note-card");
+        const isDark = body.classList.contains("dark");
+        div.style.borderLeft = `5px solid ${note.color}`;
+        div.style.backgroundColor = isDark ? "#333" : "#fff";
+        div.style.color = isDark ? "#eee" : "#222";
+        div.innerHTML = `<h3>${note.title}</h3> 
+    <p> ${note.content} </p>
+    <small> <br> Category : ${note.category} </small>
+    <div class = "note-actions">
+     <button class="editBtn">Edit</button>
+      <button class="deleteBtn">Delete</button>
+      <button class="pinBtn">Pin</button>
+      </div>`;
+        notesContainer.appendChild(div);
+        const editBtn = div.querySelector(".editBtn");
+        editBtn.addEventListener("click", () => {
+          edit(note);
+        });
+        const deleteBtn = div.querySelector(".deleteBtn");
+        deleteBtn.addEventListener("click", () => {
+          deleteNote(note);
+        });
+        const pinBtn = div.querySelector(".pinBtn");
+        pinBtn.textContent = note.pinned ? "Unpin" : "Pin";
+        pinBtn.addEventListener("click", () => {
+          togglePin(note);
+        });
+      };
+
+      //! get from local storage
+      const loadNotes = () => {
+        storage
+          .sort((a, b) => {
+            if (b.pinned - a.pinned !== 0) return b.pinned - a.pinned;
+            return a.id - b.id;
+          })
+          .forEach((n) => savedNotes(n));
+      };
+      window.onload = loadNotes;
+
+      //! save Notes
+      saveNote.addEventListener("click", () => {
+        if (editingNote) {
+          updateNode(editingNote);
+        } else {
+          newNote();
+        }
+      });
+
+      //! edit button
+      const edit = (note) => {
+        modal.style.display = "block";
+        editingNote = note;
+        noteTitle.value = note.title;
+        noteContent.value = note.content;
+        noteCategory.value = note.category;
+        noteColor.value = note.color;
+      };
+      //! update notes
+
+      const updateNode = (note) => {
+        const noteToUpdate = storage.find((n) => n.id === note.id);
+        noteToUpdate.title = noteTitle.value;
+        noteToUpdate.content = noteContent.value;
+        noteToUpdate.category = noteCategory.value;
+        noteToUpdate.color = noteColor.value;
+        save();
+        modal.style.display = "none";
+        notesContainer.innerHTML = "";
+        noteTitle.value = "";
+        noteContent.value = "";
+        loadNotes();
+        editingNote = null;
+      };
+
+      //! Delete note
+
+      const deleteNote = (note) => {
+        storage = storage.filter((n) => n.id !== note.id);
+        save();
+        notesContainer.innerHTML = "";
+        loadNotes();
+      };
+      const togglePin = (note) => {
+        note.pinned = !note.pinned;
+        save();
+        notesContainer.innerHTML = "";
+        loadNotes();
+      };
+
+      //! Searching
+      search.addEventListener("input", (e) => {
+        const text = e.target.value;
+        filtering(text);
+      });
+      const filtering = (text) => {
+        notesContainer.innerHTML = "";
+        const filtered = storage.filter(
+          (note) =>
+            note.title.toLowerCase().includes(text.toLowerCase()) ||
+            note.content.toLowerCase().includes(text.toLowerCase())
+        );
+        filtered.forEach((note) => savedNotes(note));
+        console.log(filtered);
+      };
+      const body = document.body;
+      const modalContent = document.querySelector(".modal-content");
+
+      // ! toggleTheme
+      toggleTheme.addEventListener("click", () => {
+        body.classList.toggle("dark");
+        modalContent.classList.toggle("dark");
+        document.querySelectorAll(".note-card").forEach((note) => {
+          note.classList.toggle("dark");
+        });
+        const isDark = body.classList.contains("dark");
+        localStorage.setItem("darkMode", isDark);
+      });
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const savedDark = localStorage.getItem("darkMode") === "true";
+        if (savedDark) {
+          body.classList.add("dark");
+          modalContent.classList.add("dark");
+          document
+            .querySelectorAll(".note-card")
+            .forEach((note) => note.classList.add("dark"));
+        }
+      });
+    </script>
+  </body>
+</html>
