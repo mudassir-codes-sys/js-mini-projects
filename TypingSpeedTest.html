@@ -102,24 +102,22 @@
         text-decoration: underline wavy 2px red;
       }
 
-      /* Input */
-      .input-area {
-        margin-top: 15px;
-      }
-
-      input {
+      textarea#inputField {
         width: 100%;
         padding: 14px;
         font-size: 1.1rem;
-        background: var(--card);
-        border: 2px solid var(--text-dim);
+        font-family: "Poppins", sans-serif;
         border-radius: var(--radius);
+        border: 2px solid var(--text-dim);
+        background: var(--card);
         color: var(--text-main);
         outline: none;
+        overflow: hidden;
+        resize: none;
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
       }
 
-      input:focus {
+      textarea#inputField:focus {
         border-color: var(--accent2);
         box-shadow: 0 0 10px rgba(124, 92, 255, 0.4);
       }
@@ -315,12 +313,12 @@
       </div>
 
       <div class="input-area">
-        <input
-          type="text"
+        <textarea
           id="inputField"
           placeholder="Start typing here..."
           autocomplete="off"
-        />
+          rows="1"
+        ></textarea>
       </div>
       <div class="stats">
         <div class="stat-box">WPM<span id="wpm">0</span></div>
@@ -418,6 +416,8 @@
       inputField.addEventListener("input", () => {
         const input = inputField.value.split("");
         const spans = box.querySelectorAll("span");
+        inputField.style.height = "auto";
+        inputField.style.height = inputField.scrollHeight + "px";
         total = input.length;
         mistake = 0;
 
