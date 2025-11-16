@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      /* Basic Reset */
+      /* Basic Reset */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+      }
+
+      /* Calculator Container */
+      .calculator {
+        width: 320px;
+        background: #1e1e1e;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        margin: 50px auto;
+      }
+
+      /* Display */
+      .display input {
+        width: 100%;
+        height: 50px;
+        background: #121212;
+        color: #fff;
+        font-size: 1.8rem;
+        text-align: right;
+        border: none;
+        border-radius: 10px;
+        padding: 0 15px;
+        margin-bottom: 15px;
+        box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Buttons Grid */
+      .buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      /* Button Styles */
+      .btn {
+        background: #2c2c2c;
+        color: #fff;
+        border: none;
+        padding: 15px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+      }
+
+      .btn:hover {
+        background: #ffbb33;
+        color: #000;
+        transform: translateY(-2px);
+      }
+
+      /* Equal Button Special */
+      .equal {
+        background: #7c5cff;
+        color: #fff;
+        grid-column: span 2;
+      }
+
+      .equal:hover {
+        background: #ff8800;
+        transform: translateY(-2px);
+      }
+
+      /* Operator Buttons */
+      [data-action="operator"],
+      [data-action="clear"],
+      [data-action="backspace"],
+      [data-action="sign"],
+      [data-action="sqrt"],
+      [data-action="square"],
+      [data-action="reciprocal"],
+      [data-action="mplus"],
+      [data-action="mminus"],
+      [data-action="mc"],
+      [data-action="mr"] {
+        background: #444;
+        color: #fff;
+      }
+
+      [data-action="operator"]:hover,
+      [data-action="clear"]:hover,
+      [data-action="backspace"]:hover,
+      [data-action="sign"]:hover,
+      [data-action="sqrt"]:hover,
+      [data-action="square"]:hover,
+      [data-action="reciprocal"]:hover,
+      [data-action="mplus"]:hover,
+      [data-action="mminus"]:hover,
+      [data-action="mc"]:hover,
+      [data-action="mr"]:hover {
+        background: #ffbb33;
+        color: #000;
+        transform: translateY(-2px);
+      }
+
+      /* Compact Buttons */
+      .btn,
+      .equal,
+      [data-action] {
+        height: 50px;
+        font-weight: 600;
+      }
+
+      /* Responsive */
+      @media (max-width: 400px) {
+        .calculator {
+          width: 95%;
+          padding: 15px;
+        }
+
+        .display input {
+          height: 45px;
+          font-size: 1.5rem;
+        }
+
+        .btn,
+        .equal {
+          height: 45px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <div class="display">
+        <input type="text" id="calcDisplay" disabled placeholder="0" />
+      </div>
+      <div class="buttons">
+        <!-- Memory -->
+        <button class="btn" data-action="mc">MC</button>
+        <button class="btn" data-action="mr">MR</button>
+        <button class="btn" data-action="mplus">M+</button>
+        <button class="btn" data-action="mminus">M-</button>
+
+        <!-- Clear / Backspace -->
+        <button class="btn" data-action="clear">C</button>
+        <button class="btn" data-action="backspace">←</button>
+        <button class="btn" data-action="sign">±</button>
+        <button class="btn" data-action="operator">/</button>
+
+        <!-- Numbers and operators -->
+        <button class="btn" data-number="7">7</button>
+        <button class="btn" data-number="8">8</button>
+        <button class="btn" data-number="9">9</button>
+        <button class="btn" data-action="operator">*</button>
+
+        <button class="btn" data-number="4">4</button>
+        <button class="btn" data-number="5">5</button>
+        <button class="btn" data-number="6">6</button>
+        <button class="btn" data-action="operator">-</button>
+
+        <button class="btn" data-number="1">1</button>
+        <button class="btn" data-number="2">2</button>
+        <button class="btn" data-number="3">3</button>
+        <button class="btn" data-action="operator">+</button>
+
+        <button class="btn" data-number="0">0</button>
+        <button class="btn" data-number=".">.</button>
+        <button class="btn" data-action="sqrt">√</button>
+        <button class="btn" data-action="square">x²</button>
+
+        <button class="btn" data-action="reciprocal">1/x</button>
+        <button class="btn equal" data-action="calculate">=</button>
+      </div>
+    </div>
+    <script>
+      const inputField = document.querySelector("#calcDisplay");
+      const buttons = document.querySelectorAll(".btn");
+      let display = inputField.value || "";
+      let memory = 0;
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const action = btn.dataset.action;
+          switch (action) {
+            case "mc":
+              memory = 0;
+              break;
+            case "mr":
+              display = String(memory);
+              break;
+            case "mplus":
+              memory += parseFloat(display) || 0;
+              break;
+            case "mminus":
+              memory -= parseFloat(display) || 0;
+              break;
+            case "clear":
+              display = "";
+              break;
+            case "backspace":
+              display = display.slice(0, -1);
+              break;
+            case "sign":
+              display = display ? String(parseFloat(display) * -1) : "";
+              break;
+            case "sqrt":
+              display = display ? String(Math.sqrt(parseFloat(display))) : "";
+              break;
+            case "square":
+              display = display ? String(Math.pow(parseFloat(display), 2)) : "";
+              break;
+            case "reciprocal":
+              display = display ? String(1 / parseFloat(display)) : "";
+              break;
+            case "calculate":
+              try {
+                display = eval(
+                  display
+                    .replace(/×/g, "*")
+                    .replace(/÷/g, "/")
+                    .replace(/−/g, "-")
+                );
+              } catch (error) {
+                display = "error";
+              }
+              break;
+            default:
+              display += btn.innerText;
+              break;
+          }
+          inputField.value = display || "0";
+        });
+      });
+      document.addEventListener("keydown", (e) => {
+        const key = e.key;
+        if (!isNaN(key)) {
+          display += key;
+        } else if (key === "." && !display.includes(".")) {
+          display += ".";
+        } else if (["+", "-", "*", "/"].includes(key)) {
+          display += key;
+        } else if (key === "Backspace") {
+          display = display.slice(0, -1);
+        } else if (key === "Delete") {
+          display = "";
+        } else if (key === "Enter") {
+          try {
+            display = String(eval(display));
+          } catch (error) {
+            display = "error";
+          }
+        }
+        inputField.value = display || "0  ";
+      });
+    </script>
+  </body>
+</html>
