@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Typing Speed Test - Monkeytype Style Advanced</title>
+    <style>
+      :root {
+        --bg: #0f0f0f;
+        --card: #1b1b1b;
+        --text-main: #e6e6e6;
+        --text-dim: #8b8b8b;
+        --accent: #ffbb33;
+        --accent2: #7c5cff;
+        --radius: 12px;
+        --font-main: "Poppins", sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-main);
+        background: var(--bg);
+        color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      body.light-theme {
+        --bg: #ffffff;
+        --card: #f8f8f8;
+        --text-main: #111;
+        --text-dim: #555;
+        --accent: #ff8800;
+        --accent2: #6a3cff;
+      }
+
+      .typing-container {
+        background: var(--card);
+        width: 100%;
+        max-width: 900px;
+        padding: 30px;
+        border-radius: var(--radius);
+        box-shadow: 0 0 40px rgba(124, 92, 255, 0.3);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 2rem;
+        color: var(--accent2);
+        margin-bottom: 10px;
+      }
+
+      .select {
+        text-align: center;
+        font-size: 1.3rem;
+        color: var(--accent2);
+        margin-bottom: 10px;
+      }
+
+      /* Word Box */
+      .word-box {
+        background: var(--card);
+        padding: 20px;
+        border-radius: var(--radius);
+        min-height: 120px;
+        font-size: 1.5rem;
+        line-height: 2rem;
+        user-select: none;
+        overflow: hidden;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+      }
+
+      .word-box span {
+        color: var(--text-dim);
+        margin-right: 2px;
+        transition: color 0.2s ease, border-bottom 0.2s ease;
+      }
+
+      .word-box .active {
+        color: var(--accent);
+        border-bottom: 2px solid var(--accent);
+      }
+
+      .word-box .correct {
+        color: #4caf50;
+      }
+
+      .word-box .incorrect {
+        color: #ff4444;
+        text-decoration: underline wavy 2px red;
+      }
+
+      /* Input */
+      .input-area {
+        margin-top: 15px;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.1rem;
+        background: var(--card);
+        border: 2px solid var(--text-dim);
+        border-radius: var(--radius);
+        color: var(--text-main);
+        outline: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      input:focus {
+        border-color: var(--accent2);
+        box-shadow: 0 0 10px rgba(124, 92, 255, 0.4);
+      }
+
+      /* Stats */
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+
+      .stat-box {
+        flex: 1;
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 14px;
+        text-align: center;
+        transition: transform 0.2s ease;
+        font-size: 0.95rem;
+      }
+
+      .stat-box:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(124, 92, 255, 0.3);
+      }
+
+      .stat-box span {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--accent2);
+        margin-top: 4px;
+      }
+
+      /* Theme Toggle */
+      .theme-toggle {
+        align-self: flex-end;
+        background: var(--accent);
+        border: none;
+        padding: 6px 12px;
+        border-radius: var(--radius);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: background 0.3s ease;
+      }
+
+      .theme-toggle:hover {
+        background: var(--accent2);
+      }
+
+      /* Paragraph list */
+      .para {
+        font-size: 0.8rem;
+      }
+
+      .para-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .para-wrapper .para {
+        flex: 1;
+        margin-right: 10px;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        color: var(--text-dim);
+      }
+
+      .btn-start-para {
+        padding: 6px 12px;
+        border: none;
+        border-radius: var(--radius);
+        background: var(--accent2);
+        color: #fff;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      .btn-start-para:hover {
+        background: var(--accent);
+        transform: scale(1.05);
+      }
+
+      /* Reset Button */
+      .reset-btn {
+        align-self: flex-end;
+        background: #ff4444;
+        border: none;
+        padding: 6px 12px;
+        border-radius: var(--radius);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-top: 8px;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      .reset-btn:hover {
+        background: #ff6666;
+        transform: scale(1.05);
+      }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .word-box {
+          font-size: 1.2rem;
+          line-height: 1.7rem;
+        }
+        input {
+          font-size: 1rem;
+          padding: 12px;
+        }
+        .stat-box span {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="typing-container">
+      <h1>Monkeytype Advanced</h1>
+      <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+      <button class="reset-btn" id="resetBtn">Reset Test</button>
+      <h2 class="select">Select a quote & start typing...</h2>
+      <div class="word-box" id="wordBox">
+        <div class="para-wrapper">
+          <p class="para para1">
+            The quick brown fox jumps over the lazy dog. This famous sentence
+            contains every letter of the alphabet, making it ideal for beginners
+            to practice typing. Focus on steady rhythm and accuracy to improve
+            your typing skills gradually.
+          </p>
+          <button class="btn-start-para">Start</button>
+        </div>
+
+        <div class="para-wrapper">
+          <p class="para para2">
+            Learning to type quickly and accurately is an essential skill for
+            students, professionals, writers, and anyone who frequently
+            interacts with computers. Consistent practice with proper finger
+            placement enhances speed and precision over time.
+          </p>
+          <button class="btn-start-para">Start</button>
+        </div>
+
+        <div class="para-wrapper">
+          <p class="para para3">
+            Efficient typing requires a combination of speed, accuracy, and
+            concentration, especially when working with long or complex texts.
+            Gradually increasing text difficulty helps prepare for real-world
+            scenarios where typing precision is necessary.
+          </p>
+          <button class="btn-start-para">Start</button>
+        </div>
+
+        <div class="para-wrapper">
+          <p class="para para4">
+            Typing is not just about speed but also endurance, precision, and
+            consistency. Proper posture, finger placement, and avoiding
+            unnecessary movements can make typing smoother and longer sessions
+            comfortable.
+          </p>
+          <button class="btn-start-para">Start</button>
+        </div>
+
+        <div class="para-wrapper">
+          <p class="para para5">
+            Complex sentences, varied punctuation, numbers, and unusual words
+            challenge even experienced typists. Practicing diverse materials
+            such as creative writing, technical documents, or numerical data
+            enhances reflexes and overall dexterity.
+          </p>
+          <button class="btn-start-para">Start</button>
+        </div>
+
+        <div class="para-wrapper">
+          <p class="para para6">
+            Achieving mastery in typing requires consistent and deliberate
+            practice across different types of content. Structured exercises,
+            speed drills, and accuracy tests combined with proper posture lead
+            to exceptional typing skill and fluency.
+          </p>
+          <button class="btn-start-para">Start</button>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input
+          type="text"
+          id="inputField"
+          placeholder="Start typing here..."
+          autocomplete="off"
+        />
+      </div>
+      <div class="stats">
+        <div class="stat-box">WPM<span id="wpm">0</span></div>
+        <div class="stat-box">Accuracy<span id="accuracy">100%</span></div>
+        <div class="stat-box">Mistakes<span id="mistakes">0</span></div>
+        <div class="stat-box">Time<span id="time">60s</span></div>
+      </div>
+    </div>
+    <script>
+      const paragraphs = [
+        "The quick brown fox jumps over the lazy dog. This famous sentence contains every letter of the alphabet, making it ideal for beginners to practice typing. Focus on steady rhythm and accuracy to improve your typing skills gradually. Remember, consistent practice over time builds confidence and helps reduce errors while increasing words per minute.",
+
+        "Learning to type quickly and accurately is an essential skill for students, professionals, writers, and anyone who frequently interacts with computers. Consistent practice with proper finger placement enhances speed and precision over time. Engaging with diverse types of content such as stories, articles, or quotes keeps practice interesting and challenging, preparing you for real-world typing tasks.",
+
+        "Efficient typing requires a combination of speed, accuracy, and concentration, especially when working with long or complex texts. Gradually increasing text difficulty helps prepare for real-world scenarios where typing precision is necessary. Reviewing mistakes, practicing difficult words, and timing yourself ensures continuous improvement in both speed and accuracy, building a reliable typing foundation.",
+
+        "Typing is not just about speed but also endurance, precision, and consistency. Proper posture, finger placement, and avoiding unnecessary hand movement are critical for smooth typing. Regular practice allows longer sessions without fatigue, strengthens muscle memory, and increases accuracy. Structured exercises with timed challenges develop both hand dexterity and mental focus over time.",
+
+        "Complex sentences, varied punctuation, numbers, and unusual words challenge even experienced typists. Practicing diverse materials such as creative writing, technical documents, or numerical data enhances reflexes and overall dexterity. Gradually increasing paragraph length and complexity ensures that you are prepared for professional or academic typing tasks that require both speed and precision.",
+
+        "Achieving mastery in typing requires consistent and deliberate practice across different types of content. Structured exercises, speed drills, and accuracy tests combined with proper posture lead to exceptional typing skill and fluency. Over time, these practices improve words per minute, reduce errors, and make typing effortless and efficient, suitable for real-world applications and professional tasks.",
+      ];
+      const startBtns = document.querySelectorAll(".btn-start-para");
+      const box = document.querySelector("#wordBox");
+      const inputField = document.getElementById("inputField");
+      const time = document.querySelector("#time");
+      const wpm = document.querySelector("#wpm");
+      const mistakes = document.querySelector("#mistakes");
+      const resetBtn = document.querySelector("#resetBtn");
+      const originalBox = document.querySelector("#wordBox").innerHTML;
+      const accuracy = document.querySelector("#accuracy");
+      const themeToggle = document.querySelector("#themeToggle");
+      let interval;
+      let remainingTime = 60;
+
+      //! Start
+      function Start() {
+        const newBtns = document.querySelectorAll(".btn-start-para");
+
+        newBtns.forEach((btn, idx) => {
+          btn.addEventListener(
+            "click",
+            () => {
+              clearInterval(interval);
+              inputField.value = "";
+              inputField.focus();
+              remainingTime = 60;
+              loadPara(idx);
+              timer();
+            },
+            { once: true }
+          );
+        });
+      }
+      Start();
+
+      //! Time
+      let total = 0;
+
+      let timeLimit = 60;
+      let mistake = 0;
+      const timer = () => {
+        const startTime = new Date();
+        interval = setInterval(() => {
+          remainingTime--;
+          time.innerText = remainingTime + "s";
+          if (remainingTime <= 0) {
+            clearInterval(interval);
+            inputField.disabled = true;
+          }
+
+          const elapsedMinute = (timeLimit - remainingTime) / 60;
+          const wordPerMinute = Math.round(
+            (total - mistake) / 5 / (elapsedMinute || 1)
+          );
+          wpm.innerText = wordPerMinute;
+          let timeAcc;
+          timeAcc =
+            total > 0 ? Math.round(((total - mistake) / total) * 100) : 100;
+
+          accuracy.textContent = timeAcc + "%";
+        }, 1000);
+      };
+      // load Para
+      const loadPara = (idx) => {
+        const para = paragraphs[idx];
+        const charSpans = para
+          .split("")
+          .map((ch) => `<span>${ch}</span>`)
+          .join("");
+        box.innerHTML = `<p>${charSpans}</p>`;
+      };
+
+      //check Para
+      inputField.addEventListener("input", () => {
+        const input = inputField.value.split("");
+        const spans = box.querySelectorAll("span");
+        total = input.length;
+        mistake = 0;
+
+        spans.forEach((span, idx) => {
+          const char = input[idx];
+          if (char == null) {
+            span.classList.remove("correct", "incorrect");
+          } else if (char === span.textContent) {
+            span.classList.add("correct");
+            span.classList.remove("incorrect");
+          } else {
+            span.classList.add("incorrect");
+            span.classList.remove("correct");
+            mistake++;
+          }
+        });
+        mistakes.innerText = mistake;
+      });
+      // Reset
+      const reset = () => {
+        clearInterval(interval);
+        mistakes.textContent = 0;
+        accuracy.textContent = "100%";
+        wpm.textContent = 0;
+        remainingTime = 60;
+        time.textContent = remainingTime + "s";
+        inputField.value = "";
+        inputField.disabled = false;
+        box.innerHTML = originalBox;
+        Start();
+      };
+      resetBtn.addEventListener("click", reset);
+
+      //  Theme Toggle
+      themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("light-theme");
+      });
+    </script>
+  </body>
+</html>
